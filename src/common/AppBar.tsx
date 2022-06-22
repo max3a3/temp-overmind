@@ -15,8 +15,7 @@ import {
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
 import { MdAccountBalanceWallet } from 'react-icons/md'
 import { useLocation } from 'wouter';
-import { actionIncrementFunds, globalState } from "../hookState/state";
-import { useState } from "@hookstate/core";
+import { useActions, useAppState } from "../overmind";
 const Links = ['Home', 'Page1'];
 
 const NavLink: React.FC<any> = ({ children, handleClick }: { children: ReactNode, handleClick: any }) => (
@@ -34,20 +33,16 @@ const NavLink: React.FC<any> = ({ children, handleClick }: { children: ReactNode
 );
 
 export const Appbar: React.FC = () => {
-    const state = useState(globalState);
-
+    const state = useAppState();
+    const actions = useActions()
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [location, setLocation] = useLocation();
     const handleClick = (path: string) => {
         setLocation(`/${path.toLowerCase()}`)
     }
 
-    const hasFunds = () => {
-        return state.currentFunds.get() > 0
-    }
-
     const handleConnectWallet = () => {
-        actionIncrementFunds()
+        actions.addFunds()
     }
     return (
         <>
@@ -71,14 +66,14 @@ export const Appbar: React.FC = () => {
                         </HStack>
                     </HStack>
                     <Flex alignItems={'center'}>
-                        {hasFunds()
+                        {state.currentFunds > 0
                             ? <Button
                                 variant={'solid'}
                                 colorScheme={'red'}
                                 size={'md'}
                                 onClick={handleConnectWallet}
                                 mr={4}>
-                                {state.currentFunds.get()} $
+                                {state.currentFunds} $
                             </Button>
                             : <Button
                                 variant={'solid'}
